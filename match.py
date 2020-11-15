@@ -8,7 +8,6 @@ URL: https://docs.opencv.org/master/dc/dc3/tutorial_py_matcher.html
 
 import cv2 as cv
 from helpers import plot_img
-from sift import getSIFT
 
 # FLANN parameters
 FLANN_INDEX_KDTREE = 1
@@ -35,11 +34,14 @@ def getMatches(kp1, des1, kp2, des2):
 
 
 if __name__ == "__main__":
+    
+    from keypoints import getKD, KD
+    
     img1 = cv.imread('imgs/rom3.jpg')
     img2 = cv.imread('imgs/rom4.jpg')
 
-    kp1, des1 = getSIFT(img1)
-    kp2, des2 = getSIFT(img2)
+    kp1, des1 = getKD(KD.SIFT, img1)
+    kp2, des2 = getKD(KD.SIFT, img2)
 
     matches, matchesMask = getMatches(kp1, des1, kp2, des2)
 
