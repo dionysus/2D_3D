@@ -16,7 +16,7 @@ def getSIFT(img):
 
 if __name__ == "__main__":
     # test and plot keypoints of an image of the RoM building
-    img = cv.imread('rom.jpg')
+    img = cv.imread('imgs/rom.jpg')
     gray= cv.cvtColor(img,cv.COLOR_BGR2GRAY)
     kp, des = getSIFT(img)
     

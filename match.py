@@ -35,8 +35,8 @@ def getMatches(kp1, des1, kp2, des2):
 
 
 if __name__ == "__main__":
-    img1 = cv.imread('rom3.jpg')
-    img2 = cv.imread('rom4.jpg')
+    img1 = cv.imread('imgs/rom3.jpg')
+    img2 = cv.imread('imgs/rom4.jpg')
 
     kp1, des1 = getSIFT(img1)
     kp2, des2 = getSIFT(img2)
