@@ -7,18 +7,18 @@ def getSIFT(img):
     
     From: https://docs.opencv.org/master/da/df5/tutorial_py_sift_intro.html
     '''
-    gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
     sift = cv.SIFT_create()
-    kp = sift.detect(gray,None)
+    gray= cv.cvtColor(img,cv.COLOR_BGR2GRAY)
+    kp, des = sift.detectAndCompute(gray, None)
     
-    return kp
+    return kp, des
 
 
 if __name__ == "__main__":
     # test and plot keypoints of an image of the RoM building
     img = cv.imread('rom.jpg')
     gray= cv.cvtColor(img,cv.COLOR_BGR2GRAY)
-    kp = getSIFT(img)
+    kp, des = getSIFT(img)
     
     imgA=cv.drawKeypoints(gray,kp,img)
     plot_img(img)
