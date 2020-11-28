@@ -6,7 +6,7 @@ URL: https://docs.opencv.org/master/dc/dc3/tutorial_py_matcher.html
 * just testing out the implementations from the OPENCV docs 
 '''
 
-import cv2 as cv
+import cv2
 from helpers import plot_img
 
 # FLANN parameters
@@ -18,8 +18,7 @@ def getMatches(kp1, des1, kp2, des2):
     '''
     Returns matches given two sets of keypoints and descriptors
     '''
-    flann = cv.FlannBasedMatcher(index_params,search_params)
-    
+    flann = cv2.FlannBasedMatcher(index_params,search_params)
     matches = flann.knnMatch(des1,des2,k=2)
     
     # Need to draw only good matches, so create a mask
@@ -32,13 +31,21 @@ def getMatches(kp1, des1, kp2, des2):
     
     return matches, matchesMask
 
+def plot_matches(img1,kp1,img2,kp2,matches,matchesMask):
+  draw_params = dict(matchColor = (0,255,0),
+                     singlePointColor = (255,0,0),
+                     matchesMask = matchesMask,
+                     flags = cv2.DrawMatchesFlags_DEFAULT)
+
+  img3 = cv2.drawMatchesKnn(img1,kp1,img2,kp2,matches,None,**draw_params)
+  plot_img(img3)
 
 if __name__ == "__main__":
     
     from keypoints import getKD, KD
     
-    img1 = cv.imread('imgs/rom3.jpg')
-    img2 = cv.imread('imgs/rom4.jpg')
+    img1 = cv2.imread('imgs/rom3.jpg')
+    img2 = cv2.imread('imgs/rom4.jpg')
 
     kp1, des1 = getKD(KD.SIFT, img1)
     kp2, des2 = getKD(KD.SIFT, img2)
@@ -49,7 +56,7 @@ if __name__ == "__main__":
     draw_params = dict(matchColor = (0,255,0),
                        singlePointColor = (255,0,0),
                        matchesMask = matchesMask,
-                       flags = cv.DrawMatchesFlags_DEFAULT)
+                       flags = cv2.DrawMatchesFlags_DEFAULT)
 
-    img3 = cv.drawMatchesKnn(img1,kp1,img2,kp2,matches,None,**draw_params)
+    img3 = cv2.drawMatchesKnn(img1,kp1,img2,kp2,matches,None,**draw_params)
     plot_img(img3)
