@@ -30,8 +30,7 @@ if __name__ == "__main__":
   img1_small = cv2.resize(img1_undistorted, dim)
   img2_small = cv2.resize(img2_undistorted, dim)
 
-  
-  # STEREO METHOD 
+  # STEREO METHOD
   # https://medium.com/@omar.ps16/stereo-3d-reconstruction-with-opencv-using-an-iphone-camera-part-iii-95460d3eddf0
   # get disparity_map - this is not working
   disparity_map = get_disparity_map(img1_small,img2_small)
@@ -46,6 +45,11 @@ if __name__ == "__main__":
 
   # get matches
   matches, matchesMask = getMatches(kp1, des1, kp2, des2)
-
-  # draw matches
   plot_matches(img1_small,kp1,img2_small,kp2,matches,matchesMask)
+  
+  #TODO: get Depth Map
+  depth_map = get_depthmap()
+  # camera stuff
+  # Homograpy
+
+  get_point_cloud(img1_small, depth_map)
