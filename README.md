@@ -1,11 +1,16 @@
 # DR.NRD's Miracle Photogrammetry Machine
 
-# Ideas
-- calibrate camera
-- undisort images
-- sift
+# Process
+- preprocess images
+  - calibrate camera
+  - undistort images
+- keypoint detection
+- matching between images
 - ?? MAGIC ??
 - point cloud
+
+# Novel Ideas?
+- ?? not sure yet
 
 # References
 - https://docs.opencv.org/master/dc/dc3/tutorial_py_matcher.html
