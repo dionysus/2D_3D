@@ -9,7 +9,7 @@ from cloud import get_point_cloud
 
 if __name__ == "__main__":
 
-  # calibrate camera with chessboard
+  #! 1) calibrate camera with chessboard
   # note: take a few pictures of the OpenCV chessboard with source camera
   calibrate_folder = 'calibrate'
   calibrate_camera(calibrate_folder)
@@ -18,7 +18,7 @@ if __name__ == "__main__":
   img1 = cv2.imread('imgs/img_clip01.jpg', 0)
   img2 = cv2.imread('imgs/img_clip02.jpg', 0)
 
-  # undistort images
+  #! 2) undistort images
   img1_undistorted = undistort_img(img1)
   img2_undistorted = undistort_img(img2)
   # plot_img(img1_undistorted)
