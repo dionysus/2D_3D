@@ -14,7 +14,7 @@ import PIL.ExifTags
 import PIL.Image
 from helpers import *
 
-def calibrate_camera(image_folder):
+def calibrate_camera():
   '''
   Calibrate and save settings for source camera
   '''
@@ -34,17 +34,13 @@ def calibrate_camera(image_folder):
   obj_points = [] # 3d point in real world space
   img_points = [] # 2d points in image plane.
 
+  calibration_images = glob.glob("calibrate/*")
+  print(calibration_images)
   # images to calibrate from
-  calibration_images = glob.glob(image_folder + "/*")
-
   for image in calibration_images:
-
       # process calibration image with chessboard corners
       img = cv2.imread(image)
       gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-      # scale = 0.5
-      # dim = (int(gray.shape[1] * scale), int(gray.shape[0] * scale))
-      # gray = cv2.resize(gray, dim)
       ret, corners = cv2.findChessboardCorners(gray, board_dims, None)
 
       if not ret:
@@ -57,7 +53,7 @@ def calibrate_camera(image_folder):
           obj_points.append(objp)
 
           # Draw and display the corners
-          display_img = cv2.drawChessboardCorners(gray, board_dims, sub_corners, ret)
+          display_img = cv2.drawChessboardCorners(img, board_dims, sub_corners, ret)
           # plot_img(display_img)
 
   # run calibrate camera with processed images
@@ -71,7 +67,7 @@ def calibrate_camera(image_folder):
   for k, v in exif_img._getexif().items()
   if k in PIL.ExifTags.TAGS}
   focal_length = exif_data['FocalLength']
-  print(focal_length)
+  print("focal length: {}".format(focal_length))
 
   # save calibration settings to file
   np.save("./calibrated_params/ret", ret)
@@ -80,3 +76,7 @@ def calibrate_camera(image_folder):
   np.save("./calibrated_params/rvecs", rvecs)
   np.save("./calibrated_params/tvecs", tvecs)
   np.save("./calibrated_params/FocalLength", focal_length)
+
+def load_K():
+  K = np.load('./calibrated_params/K.npy')
+  return K

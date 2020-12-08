@@ -1,55 +1,45 @@
 import cv2
-from helpers import plot_img
+
+from undistort import undistort_img
+from calibrate import calibrate_camera, load_K
 from keypoints import getKD, KD
 from match import getMatches, plot_matches
-from calibrate import calibrate_camera
-from undistort import undistort_img
-from disparity import get_disparity_map
+from epipolar import get_fundamental_matrix
 from cloud import get_point_cloud
+from helpers import plot_img
 
 if __name__ == "__main__":
 
-  #! 1) calibrate camera with chessboard
+  print("-" * 60)
+  #! 1. calibrate camera with chessboard
   # note: take a few pictures of the OpenCV chessboard with source camera
-  calibrate_folder = 'calibrate'
-  calibrate_camera(calibrate_folder)
+  # don't need to do this again since they have been saved for the sample images
+  # calibrate_camera()
+  K = load_K()
+  print("K (Intrinsic) Matrix:")
+  print(K)
+  print()
 
   # open target images
   img1 = cv2.imread('imgs/img_clip01.jpg', 0)
   img2 = cv2.imread('imgs/img_clip02.jpg', 0)
 
-  #! 2) undistort images
+  #! 2. undistort images
   img1_undistorted = undistort_img(img1)
   img2_undistorted = undistort_img(img2)
-  # plot_img(img1_undistorted)
-  # plot_img(img2_undistorted)
 
-  # shrink
-  scale = 0.5
-  dim = (int(img1_undistorted.shape[1] * scale), int(img1_undistorted.shape[0] * scale))
-  img1_small = cv2.resize(img1_undistorted, dim)
-  img2_small = cv2.resize(img2_undistorted, dim)
+  #! 3. Get Keypoint and Descriptors
+  kp1, des1 = getKD(KD.SIFT, img1_undistorted)
+  kp2, des2 = getKD(KD.SIFT, img2_undistorted)
 
-  # STEREO METHOD
-  # https://medium.com/@omar.ps16/stereo-3d-reconstruction-with-opencv-using-an-iphone-camera-part-iii-95460d3eddf0
-  # get disparity_map - this is not working
-  disparity_map = get_disparity_map(img1_small,img2_small)
-  # plot_img(disparity_map)
-  get_point_cloud(img1_small, disparity_map)
-  # I then can open this in a 3D modeling software
-
-  # OTHER METHOD
-  # get keypoint and descriptors
-  kp1, des1 = getKD(KD.SIFT, img1_small)
-  kp2, des2 = getKD(KD.SIFT, img2_small)
-
-  # get matches
-  matches, matchesMask = getMatches(kp1, des1, kp2, des2)
-  plot_matches(img1_small,kp1,img2_small,kp2,matches,matchesMask)
+  #! 4. Get Keypoint Matches
+  all_matches, good_matches, matches_mask = getMatches(kp1, des1, kp2, des2, False)
+  plot_matches(img1_undistorted,kp1,img2_undistorted,kp2,all_matches,matches_mask)
   
-  #TODO: get Depth Map
-  depth_map = get_depthmap()
-  # camera stuff
-  # Homograpy
+  #! 5. Fundamental Matrix
+  F, pts1, pts2 = get_fundamental_matrix(kp1, kp2, good_matches)
+  print("Fundamental Matrix:")
+  print(F)
+  print()
 
-  get_point_cloud(img1_small, depth_map)
+  #! 6. ???

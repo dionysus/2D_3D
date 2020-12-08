@@ -1,3 +1,8 @@
+'''
+Get Keypoints using various algorithms
+- SIFT
+'''
+
 import cv2 as cv
 from helpers import plot_img
 from enum import Enum
@@ -20,7 +25,6 @@ def getSIFT(img):
     From: https://docs.opencv.org/master/da/df5/tutorial_py_sift_intro.html
     '''
     sift = cv.SIFT_create()
-    # gray= cv.cvtColor(img,cv.COLOR_BGR2GRAY)
     kp, des = sift.detectAndCompute(img, None)
     
     return kp, des
