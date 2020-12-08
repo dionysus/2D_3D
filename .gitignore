@@ -1,6 +1,6 @@
 # Project Specific
-# calibrate/*
-# calibrated_params/*
+calibrate/*
+calibrated_params/*
 
 # Mac 
 .DS_Store
