@@ -16,5 +16,9 @@ def principal_coordinates(focal, camera, angle):
     point = np.array([c1, c2])
     return point
 
-def point_location(principal, p_plane, ):
-    pass
+def point_location(focal, principal, p_plane, image_point, mmp):
+    x_pix = image_point[0]-p_plane[0]
+    y_pix = image_point[0] - p_plane[0]
+    y_mm = y_pix*mmp
+    x_mm = x_pix * mmp
+    point_dist = np.sqrt((np.square(focal)+np.square(x_mm)))
