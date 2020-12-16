@@ -23,11 +23,21 @@ def principal_coordinates(focal, camera, angle):
     point = np.array([c1, c2, c3])
     return point
 
-def point_location(focal, principal, p_plane, image_point, mmp):
+def point_location(principal, p_plane, image_point, mmp, angle):
     # Find the location of the point on the image plane in 3D space
-
+    # Get x coordinate on image plane
     x_pix = image_point[0]-p_plane[0]
+    # Get y coordinate on image plane
     y_pix = image_point[1] - p_plane[1]
+    # In real coordinate system
     y_mm = y_pix*mmp
     x_mm = x_pix * mmp
-    point_dist = np.sqrt((np.square(focal)+np.square(x_mm)))
+    # Find angle between image plane and Z-axis
+    image_angle = angle + 90
+    # Use to figure out point in 3D space
+    c1 = principal[0] + (x_mm * np.cos(image_angle))
+    c2 = y_mm
+    c3 = principal[2] + (x_mm * np.sin(image_angle))
+    point = np.array([c1, c2, c3])
+    return point
+
