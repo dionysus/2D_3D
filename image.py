@@ -64,11 +64,11 @@ def process_matches(img1_pts, img2_pts, img1_index, img2_index, img1_image):
     pair_pts.append(projected)
 
     # color
-    print(img1_pt)
-    print("w x h: {} x {}".format(w, h))
+    # print(img1_pt)
+    # print("w x h: {} x {}".format(w, h))
 
     rgb = img1_image[int(img1_pt[1])][int(img1_pt[0])]
-    print("rgb: {}".format(rgb))
+    # print("rgb: {}".format(rgb))
     pair_rgb.append(rgb)
 
   return pair_pts, pair_rgb
@@ -81,11 +81,14 @@ def process_img_pair(img1, img2, img1_index, img2_index):
   #! 2. undistort images
   img1_undistorted = undistort_img(img1)
   img2_undistorted = undistort_img(img2)
+
+  img1_undistorted_gray = cv2.cvtColor(img1_undistorted, cv2.COLOR_BGR2GRAY)
+  img2_undistorted_gray = cv2.cvtColor(img1_undistorted, cv2.COLOR_BGR2GRAY)
   # plot_img(img1_undistorted)
 
   #! 3. Get Keypoint and Descriptors
-  kp1, des1 = getKD(KD.SIFT, img1_undistorted)
-  kp2, des2 = getKD(KD.SIFT, img2_undistorted)
+  kp1, des1 = getKD(KD.SIFT, img1_undistorted_gray)
+  kp2, des2 = getKD(KD.SIFT, img2_undistorted_gray)
 
   #! 4. Get Keypoint Matches
   all_matches, good_matches, matches_mask = getMatches(kp1, des1, kp2, des2, False)
@@ -117,11 +120,11 @@ def process_img_folder(folder, loop):
   cloud_pts = []
   cloud_rgb = []
 
-  # for i in range(iters):
-  for i in range(1): #!--------------------------------- this is for test purposes, compare first two
+  for i in range(iters):
+  # for i in range(1): #!--------------------------------- this is for test purposes, compare first two
 
     # open pair of images
-    img1 = cv2.imread(images[i], 0)
+    img1 = cv2.imread(images[i], 1)
 
     if i < len(images) - 1:
       img2_index = i+1
@@ -129,18 +132,18 @@ def process_img_folder(folder, loop):
       img2_index = 0
     else:
       break # error here, shouldn't reach
-    img2 = cv2.imread(images[img2_index], 0)
+    img2 = cv2.imread(images[img2_index], 1)
     print("comparing images: {} and {}".format(images[i], images[img2_index]))
 
     # process pair of images
     pair_pts, pair_rgb = process_img_pair(img1, img2, i, img2_index)
   
-    cloud_pts.append(pair_pts)
-    cloud_rgb.append(pair_rgb)
+    cloud_pts.extend(pair_pts)
+    cloud_rgb.extend(pair_rgb)
 
-    cloud_pts = np.array(cloud_pts)
-    cloud_rgb = np.array(cloud_rgb)
-  
+  cloud_pts = np.array(cloud_pts)
+  cloud_rgb = np.array(cloud_rgb)
+
   return cloud_pts, cloud_rgb
 
 if __name__ == "__main__":

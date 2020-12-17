@@ -48,7 +48,7 @@ def plot_point_cloud_colorless(output_points):
 		mode='markers',
 		marker=dict(
 			size=2,
-			color=[255,0,0],
+			color=[0,0,0],
 			opacity=0.8
 		)
 	)])

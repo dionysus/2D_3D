@@ -32,11 +32,13 @@ print("Processing Images into Point Cloud")
 folder = "imgs" # where the source images are stored
 loop = True     # True iff images are taken in a loop 
 cloud_pts, cloud_rgb = process_img_folder(folder, loop)
-
-
+# print("FINAL POINT CLOUD")
+# print(cloud_pts)
+print(cloud_rgb)
 
 #! 4. save and store the results
 print("\n" + "-" * 60)
 print("Plotting Point Cloud")
 # save_point_cloud(cloud_pts, cloud_rgb, "prinplup")
-plot_point_cloud_colorless(cloud_pts)
+# plot_point_cloud_colorless(cloud_pts)
+plot_point_cloud(cloud_pts, cloud_rgb)

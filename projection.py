@@ -4,8 +4,8 @@ import cv2
 
 def norm(vector):
     square = np.square(vector)
-    sum = np.sum(square)
-    return np.sqrt(sum)
+    sum_vect = np.sum(square)
+    return np.sqrt(sum_vect)
 
 
 def distance_vector(camera, image_plane):
