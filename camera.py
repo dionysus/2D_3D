@@ -11,9 +11,12 @@ https://medium.com/@omar.ps16/stereo-3d-reconstruction-with-opencv-using-an-ipho
 import numpy as np
 import cv2
 import glob
+import math
 import PIL.ExifTags
 import PIL.Image
 from helpers import *
+
+from cloud import plot_point_cloud_colorless
 
 def calibrate_camera():
   '''
@@ -84,9 +87,60 @@ def load_K():
   K = np.load('./calibrated_params/K.npy')
   return K
 
-def camera_positions(num, degree, distance, height): #!-------------------------TODO
+def save_camera_props(num_cameras, degree, distance, height): #!-------------------------TODO
   '''
   Return a list of camera coordinates, given Turntable properties. 
   '''
-  #TODO
-  pass
+  camera_props = []
+
+  # first camera 
+  curr_coord = [0, height, distance]
+  curr_angle = 0
+
+  # (x, y, z, rotation)
+  curr_camera_prop = curr_coord + [curr_angle]
+  camera_props.append(curr_camera_prop)
+
+  for i in range(1, num_cameras):
+    curr_angle += degree
+    curr_coord = rotate(curr_coord, degree)
+    curr_camera_prop = curr_coord + [curr_angle]
+    camera_props.append(curr_camera_prop)
+  
+  print(camera_props)
+  camera_props = np.array(camera_props)
+
+  np.save("./calibrated_params/camera_props", camera_props)
+
+def rotate(coord, degree):
+  '''
+  Returns the new coord given a degree rotation.
+
+  Using the transformation matrix:
+  | cos θ    0   sin θ| |x|   | x cos θ + z sin θ|   |x'|
+  |   0      1       0| |y| = |         y        | = |y'|
+  |−sin θ    0   cos θ| |z|   |−x sin θ + z cos θ|   |z'|
+  '''
+  x, y, z = coord[0], coord[1], coord[2]
+  rot = np.radians(degree)
+
+  x = x * np.cos(rot) + z * np.sin(rot)
+  z = -x * np.sin(rot) + z * np.cos(rot)
+
+  return [x, y, z]
+
+def load_camera_props():
+  camera_props = np.load('./calibrated_params/camera_props.npy')
+  return camera_props
+
+if __name__ == "__main__":
+  num_cameras = 18
+  degree = 20
+  distance = 175
+  height = 0
+
+  # save_camera_props(num_cameras,degree,distance,height)
+  camera_props = load_camera_props()
+  camera_coords = camera_props[:, :3]
+  print(camera_coords)
+  plot_point_cloud_colorless(camera_coords)

@@ -5,19 +5,60 @@ from undistort import undistort_img
 from camera import calibrate_camera, load_K
 from keypoints import getKD, KD
 from match import getMatches, plot_matches
-from projection import *
+from projection import get_focal_mm
 from epipolar import get_fundamental_matrix
 # from cloud import get_point_cloud
 from helpers import plot_img
 
 #! TODO
-def process_matches(good_matches):
-  
+def process_matches(img1_pts, img2_pts, img1_index, img2_index, img1_image):
   pair_pts, pair_rgb = []
+  num_matches = img1_pts.shape[0]
+  K = load_K()
+  focal = K[0][0]
+  img1_p = np.array([K[0][2], K[1][2]])
+  img2_p = np.array([K[0][2], K[1][2]])
+  camera_matrix = load_camera_props()
+
+  for i in range(num_matches):
+    # coordinate
+    img1_pt = img1_pts[i]
+    img2_pt = img2_pts[i]
+    w, h = img1_image.shape[1], img1_image.shape[0]
+    
+    sensor_dim = 4.8, 3.5 # in mm's from the manufacturer's site
+    sensor_width = sensor_dim[1]
+    focal_mm = get_focal_mm(focal, sensor_width, w)
+    mmp = mm_pixel(focal_mm, focal)
+    # Grab camera coord and angle
+     # (x, y, z, rotation)
+    img1_camera_coord = np.array([camera_matrix[img1_index][0],
+     camera_matrix[img1_index][1], camera_matrix[img1_index][2]])
+    img2_camera_coord = np.array([camera_matrix[img2_index][0],
+     camera_matrix[img2_index][1], camera_matrix[img2_index][2]])
+    img1_angle = camera_matrix[img1_index][3]
+    img2_angle = camera_matrix[img2_index][3]
+
+    img1_principal = principal_coordinates(focal_mm, img1_camera_coord, img1_angle)
+    img2_principal = principal_coordinates(focal_mm, img2_camera_coord, img2_angle)
+    
+    img1_location = point_location(img1_principal, img1_p, img1_pts[i], mmp, img1_angle)
+
+    img2_location = point_location(img2_principal, img2_p, img2_pts[i], mmp, img2_angle)
+    
+    img1_distance = distance_vector(img1_camera_coord, img1_location)
+    img2_distance = distance_vector(img2_camera_coord, img2_location)
+
+    projected = projected_point(img1_distance, img1_location, img2_distance, img2_location)
+
+    pair_pts.append(projected)
+    # color
+    rgb = img1_image.getpixel(img1_pt)
+    pair_rgb.append(rgb)
 
   return pair_pts, pair_rgb
 
-def process_img_pair(img1, img2):
+def process_img_pair(img1, img2, img1_index, img2_index):
   '''
   Process a pair of sequential images
   Return a list of points and a list of colors for triangulated point cloud
@@ -35,8 +76,11 @@ def process_img_pair(img1, img2):
   all_matches, good_matches, matches_mask = getMatches(kp1, des1, kp2, des2, False)
   # plot_matches(img1_undistorted,kp1,img2_undistorted,kp2,all_matches,matches_mask)
   # print("Good Matches: {}".format(len(good_matches)))
-
-  pair_pts, pair_rgb = process_matches(good_matches, ??????) --------------------------#! TODO
+  
+  # break matches into lists of coordinates
+  img1_pts = np.float32([ kp1[m.queryIdx].pt for m in good_matches ])
+  img2_pts = np.float32([ kp2[m.trainIdx].pt for m in good_matches ])
+  pair_pts, pair_rgb = process_matches(img1_pts, img2_pts, img1_index, img2_index, img1_undistorted) #! -------------------------- TODO
 
 
 def process_img_folder(folder, loop):
@@ -71,7 +115,7 @@ def process_img_folder(folder, loop):
     img2 = cv2.imread(images[img2_index], 0)
     print("comparing images: {} and {}".format(images[i], images[img2_index]))
 
-    pair_pts, pair_rgb = process_img_pair(img1, img2, i, )
+    pair_pts, pair_rgb = process_img_pair(img1, img2, i, img2_index)
     cloud_pts.append(pair_pts)
     cloud_rgb.append(pair_rgb)
   
