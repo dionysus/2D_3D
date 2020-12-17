@@ -1,8 +1,9 @@
 '''
-Calibrate with chessboard from source camera
+Camera calibration functions
 
 Adapted from openCV docs
 https://docs.opencv.org/master/d9/dab/tutorial_homography.html
+
 With further explanations gained from
 https://medium.com/@omar.ps16/stereo-3d-reconstruction-with-opencv-using-an-iphone-camera-part-ii-77754b58bfe0
 '''
@@ -17,9 +18,10 @@ from helpers import *
 def calibrate_camera():
   '''
   Calibrate and save settings for source camera
+  
+  Referencing OpenCV docs for use of chessboard
   '''
-  # chessboard dimensions
-
+  # set chessboard dimensions
   board_h = 9
   board_w = 6
   board_dims = (board_h,board_w)
@@ -35,7 +37,8 @@ def calibrate_camera():
   img_points = [] # 2d points in image plane.
 
   calibration_images = glob.glob("calibrate/*")
-  print(calibration_images)
+  # print(calibration_images)
+
   # images to calibrate from
   for image in calibration_images:
       # process calibration image with chessboard corners
@@ -60,7 +63,7 @@ def calibrate_camera():
   ret, K, dist, rvecs, tvecs = cv2.calibrateCamera(
                               obj_points, img_points,gray.shape[::-1], None, None)
 
-  # Get Focal Length of source camera
+  # Get Focal Length of source camera from image metadata
   exif_img = PIL.Image.open(calibration_images[0])
   exif_data = {
   PIL.ExifTags.TAGS[k]:v
@@ -80,3 +83,10 @@ def calibrate_camera():
 def load_K():
   K = np.load('./calibrated_params/K.npy')
   return K
+
+def camera_positions(num, degree, distance, height): #!-------------------------TODO
+  '''
+  Return a list of camera coordinates, given Turntable properties. 
+  '''
+  #TODO
+  pass
