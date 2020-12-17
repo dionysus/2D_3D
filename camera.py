@@ -124,10 +124,10 @@ def rotate(coord, degree):
   x, y, z = coord[0], coord[1], coord[2]
   rot = np.radians(degree)
 
-  x = x * np.cos(rot) + z * np.sin(rot)
-  z = -x * np.sin(rot) + z * np.cos(rot)
+  x_new = x * np.cos(rot) + z * np.sin(rot)
+  z_new = -x * np.sin(rot) + z * np.cos(rot)
 
-  return [x, y, z]
+  return [x_new, y, z_new]
 
 def load_camera_props():
   camera_props = np.load('./calibrated_params/camera_props.npy')
@@ -141,6 +141,8 @@ if __name__ == "__main__":
 
   # save_camera_props(num_cameras,degree,distance,height)
   camera_props = load_camera_props()
+
+  # check that it makes a full circle
   camera_coords = camera_props[:, :3]
-  print(camera_coords)
+  print(camera_props)
   plot_point_cloud_colorless(camera_coords)
