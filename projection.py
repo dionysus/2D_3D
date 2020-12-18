@@ -25,11 +25,13 @@ def cross_product(distance1, distance2):
 def projected_point(distance1, point1, distance2, point2):
     # Find the unit normal vector to both distance vectors
     normal = cross_product(distance1, distance2)
-    matrix = np.zeros((3, 3))
+    # matrix = np.zeros((3, 3))
     # Create a matrix of the two distance vectors and their normal
-    matrix[0] = distance1.T
-    matrix[1] = distance2.T
-    matrix[2] = normal.T
+    # matrix[0] = distance1.T
+    # matrix[1] = -distance2.T
+    # matrix[2] = normal.T
+    matrix = np.array([distance1, -distance2, normal])
+    matrix = matrix.T
     # Solve the linear system of equations to find closest points
     parameters = np.linalg.solve(matrix, point2-point1)
     # Find the point on each line that's closest to each other
@@ -39,5 +41,8 @@ def projected_point(distance1, point1, distance2, point2):
     mid_x = (first_projected[0] + second_projected[0])/2
     mid_y = (first_projected[1] + second_projected[1]) / 2
     mid_z = (first_projected[2] + second_projected[2]) / 2
+    # mid_x = (first_projected[0])
+    # mid_y = (first_projected[1])
+    # mid_z = (first_projected[2])
     projected = np.array([mid_x, mid_y, mid_z])
     return projected
