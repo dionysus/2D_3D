@@ -4,7 +4,7 @@ Camera calibration functions
 Adapted from openCV docs
 https://docs.opencv.org/master/d9/dab/tutorial_homography.html
 
-With further explanations gained from
+With further explanations of chessboard gained from
 https://medium.com/@omar.ps16/stereo-3d-reconstruction-with-opencv-using-an-iphone-camera-part-ii-77754b58bfe0
 '''
 
@@ -21,8 +21,9 @@ from cloud import plot_point_cloud_colorless
 def calibrate_camera():
   '''
   Calibrate and save settings for source camera
-  
-  Referencing OpenCV docs for use of chessboard
+
+  Referencing OpenCV docs 
+    for use of chessboard calibration
   '''
   # set chessboard dimensions
   board_h = 9
@@ -45,16 +46,15 @@ def calibrate_camera():
   # images to calibrate from
   for image in calibration_images:
       # process calibration image with chessboard corners
-      img = cv2.imread(image)
-      gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-      ret, corners = cv2.findChessboardCorners(gray, board_dims, None)
+      img = cv2.imread(image, 0)
+      ret, corners = cv2.findChessboardCorners(img, board_dims, None)
 
       if not ret:
         print("no checkerboard found for: {}".format(image))
       else:
           print("checkerboard found for: {}".format(image))
           # refine corner detection
-          sub_corners = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
+          sub_corners = cv2.cornerSubPix(img,corners,(11,11),(-1,-1),criteria)
           img_points.append(sub_corners)
           obj_points.append(objp)
 
@@ -64,7 +64,7 @@ def calibrate_camera():
 
   # run calibrate camera with processed images
   ret, K, dist, rvecs, tvecs = cv2.calibrateCamera(
-                              obj_points, img_points,gray.shape[::-1], None, None)
+                              obj_points, img_points,img.shape[::-1], None, None)
 
   # Get Focal Length of source camera from image metadata
   exif_img = PIL.Image.open(calibration_images[0])
@@ -79,15 +79,10 @@ def calibrate_camera():
   np.save("./calibrated_params/ret", ret)
   np.save("./calibrated_params/K", K)
   np.save("./calibrated_params/dist", dist)
-  np.save("./calibrated_params/rvecs", rvecs)
-  np.save("./calibrated_params/tvecs", tvecs)
   np.save("./calibrated_params/FocalLength", focal_length)
 
-def load_K():
-  K = np.load('./calibrated_params/K.npy')
-  return K
 
-def save_camera_props(num_cameras, degree, distance, height): #!-------------------------TODO
+def save_camera_props(num_cameras, degree, distance, height):
   '''
   Return a list of camera coordinates, given Turntable properties. 
   '''
@@ -103,7 +98,7 @@ def save_camera_props(num_cameras, degree, distance, height): #!----------------
 
   for i in range(1, num_cameras):
     curr_angle += degree
-    curr_coord = rotate(curr_coord, degree)
+    curr_coord = _rotate_coord(curr_coord, degree)
     curr_camera_prop = curr_coord + [curr_angle]
     camera_props.append(curr_camera_prop)
   
@@ -112,14 +107,9 @@ def save_camera_props(num_cameras, degree, distance, height): #!----------------
 
   np.save("./calibrated_params/camera_props", camera_props)
 
-def rotate(coord, degree):
+def _rotate_coord(coord, degree):
   '''
   Returns the new coord given a degree rotation.
-
-  Using the transformation matrix:
-  | cos θ    0   sin θ| |x|   | x cos θ + z sin θ|   |x'|
-  |   0      1       0| |y| = |         y        | = |y'|
-  |−sin θ    0   cos θ| |z|   |−x sin θ + z cos θ|   |z'|
   '''
   x, y, z = coord[0], coord[1], coord[2]
   rot = np.radians(degree)
@@ -129,9 +119,23 @@ def rotate(coord, degree):
 
   return [x_new, y, z_new]
 
+#! ------------------------------------- load previously saved camera properties
+
 def load_camera_props():
   camera_props = np.load('./calibrated_params/camera_props.npy')
   return camera_props
+
+def load_K():
+  K = np.load('./calibrated_params/K.npy')
+  return K
+
+def load_camera_ret():
+  ret   = np.load('./calibrated_params/ret.npy')
+  return ret
+
+def load_camera_dist():
+  dist  = np.load('./calibrated_params/dist.npy')
+  return dist
 
 if __name__ == "__main__":
   num_cameras = 18

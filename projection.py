@@ -1,12 +1,10 @@
 import numpy as np
 import cv2
 
-
 def norm(vector):
     square = np.square(vector)
     sum_vect = np.sum(square)
     return np.sqrt(sum_vect)
-
 
 def distance_vector(camera, image_plane):
     distance = image_plane-camera
@@ -20,7 +18,6 @@ def cross_product(distance1, distance2):
     normal = np.array([c1, -c2, c3])
     value = norm(normal)
     return normal / value
-
 
 def projected_point(distance1, point1, distance2, point2):
     # Find the unit normal vector to both distance vectors

@@ -18,10 +18,6 @@ def save_point_cloud(output_points, output_colors, name):
 	Output point cloud to .PLY file
 	'''
 	# Define name for output file
-	print("-" * 60)
-	print(output_points)
-	print("-" * 60)
-	print(output_colors)
 	output_file = 'output/' + name + '.ply'
 	d = {
 		'x': 			output_points[:,0], 

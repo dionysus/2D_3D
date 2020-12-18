@@ -1,13 +1,16 @@
 import numpy as np
 import cv2
 
+from camera import load_K, load_camera_dist, load_camera_ret
+
 def undistort_img(img):
   '''
   Return an undistorted image given previous calibrated parameters 
+  References from OpenCV docs
   '''
-  ret   = np.load('./calibrated_params/ret.npy')
-  K     = np.load('./calibrated_params/K.npy')
-  dist  = np.load('./calibrated_params/dist.npy')
+  ret   = load_camera_ret()
+  K     = load_K()
+  dist  = load_camera_dist()
   h,w   = img.shape[:2]
 
   new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(K,dist,(w,h),1,(w,h))
