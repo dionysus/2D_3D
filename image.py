@@ -31,7 +31,7 @@ def process_matches(img1_pts, img2_pts, img1_index, img2_index, img1_image):
     img1_pt = img1_pts[i]
     img2_pt = img2_pts[i]
     w, h = img1_image.shape[1], img1_image.shape[0]
-    
+
     sensor_dim = 4.8, 3.5 # in mm's from the manufacturer's site
     sensor_width = sensor_dim[1]
     focal_mm = get_focal_mm(focal, sensor_width, w)
@@ -40,22 +40,22 @@ def process_matches(img1_pts, img2_pts, img1_index, img2_index, img1_image):
      # (x, y, z, rotation)
     img1_camera_coord = np.array([
       camera_matrix[img1_index][0],
-      camera_matrix[img1_index][1], 
+      camera_matrix[img1_index][1],
       camera_matrix[img1_index][2]])
     img2_camera_coord = np.array([
       camera_matrix[img2_index][0],
       camera_matrix[img2_index][1],
       camera_matrix[img2_index][2]])
-  
+
     img1_angle = np.radians(camera_matrix[img1_index][3])
     img2_angle = np.radians(camera_matrix[img2_index][3])
 
     img1_principal = principal_coordinates(focal_mm, img1_camera_coord, img1_angle)
     img2_principal = principal_coordinates(focal_mm, img2_camera_coord, img2_angle)
-    
+
     img1_location = point_location(img1_principal, img1_p, img1_pts[i], mmp, img1_angle)
     img2_location = point_location(img2_principal, img2_p, img2_pts[i], mmp, img2_angle)
-    
+
     img1_distance = distance_vector(img1_camera_coord, img1_location)
     img2_distance = distance_vector(img2_camera_coord, img2_location)
 
@@ -83,7 +83,7 @@ def process_img_pair(img1, img2, img1_index, img2_index):
   img2_undistorted = undistort_img(img2)
 
   img1_undistorted_gray = cv2.cvtColor(img1_undistorted, cv2.COLOR_BGR2GRAY)
-  img2_undistorted_gray = cv2.cvtColor(img1_undistorted, cv2.COLOR_BGR2GRAY)
+  img2_undistorted_gray = cv2.cvtColor(img2_undistorted, cv2.COLOR_BGR2GRAY)
   # plot_img(img1_undistorted)
 
   #! 3. Get Keypoint and Descriptors
@@ -94,7 +94,7 @@ def process_img_pair(img1, img2, img1_index, img2_index):
   all_matches, good_matches, matches_mask = getMatches(kp1, des1, kp2, des2, False)
   # plot_matches(img1_undistorted,kp1,img2_undistorted,kp2,all_matches,matches_mask)
   # print("Good Matches: {}".format(len(good_matches)))
-  
+
   # break matches into lists of coordinates
   img1_pts = np.float32([ kp1[m.queryIdx].pt for m in good_matches ])
   img2_pts = np.float32([ kp2[m.trainIdx].pt for m in good_matches ])
@@ -137,7 +137,7 @@ def process_img_folder(folder, loop):
 
     # process pair of images
     pair_pts, pair_rgb = process_img_pair(img1, img2, i, img2_index)
-  
+
     cloud_pts.extend(pair_pts)
     cloud_rgb.extend(pair_rgb)
 
