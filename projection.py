@@ -1,5 +1,7 @@
+'''
+Determining the projection of the matched point in 3D space
+'''
 import numpy as np
-
 
 def norm(vector):
     '''
