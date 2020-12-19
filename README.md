@@ -2,21 +2,29 @@
 
 # Process
 - preprocess images
-  - calibrate camera
+  - calibrate camera parameters
+  - calculate camera positions
+  - open fold of images
   - undistort images
 - keypoint detection
-- matching between images
-- ?? MAGIC ??
-- point cloud
+- feature matching between images
+- triangulation & color
+- point cloud generation
 
-# Novel Ideas?
-- ?? not sure yet
+# How to Use:
+Simply run `main.py`.
 
-# References
-- https://docs.opencv.org/master/dc/dc3/tutorial_py_matcher.html
-- https://medium.com/@omar.ps16/stereo-3d-reconstruction-with-opencv-using-an-iphone-camera-part-iii-95460d3eddf0
-- https://github.com/daavoo/pyntcloud
-- https://www.morethantechnical.com/2012/02/07/structure-from-motion-and-3d-reconstruction-on-the-easy-in-opencv-2-3-w-code/
-- https://stackoverflow.com/questions/51991271/how-to-3d-reconstruct-robustly-from-multiple-images-with-known-poses-in-opencv
-- https://stackoverflow.com/questions/10163034/how-can-i-calculate-camera-position-by-comparing-two-photographs
-- https://docs.opencv.org/master/da/de9/tutorial_py_epipolar_geometry.html
+The important lines are:
+
+34> `cloud_pts, cloud_rgb = process_img_folder(folder, loop)`
+
+which calls `process_img_folder` on a set of images (the 360 sequence of the
+Toy from the Turntable) saved in the `imgs` folder.
+
+39> `save_point_cloud(cloud_pts, cloud_rgb, "prinplup")`
+
+which saves the processed images from line 34 to the `output` folder.
+
+40> `plot_point_cloud(cloud_pts, cloud_rgb)`
+
+which plots the point cloud from line 34 in the browser

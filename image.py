@@ -120,6 +120,7 @@ def process_img_folder(folder, loop):
   # for i in range(1): #!--------------------------------- this is for test purposes, compare first two
     # open pair of images
     img1 = cv2.imread(images[i], 1)
+    img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
 
     if i < len(images) - 1:
       img2_index = i+1
@@ -128,6 +129,8 @@ def process_img_folder(folder, loop):
     else:
       break # error here, shouldn't reach
     img2 = cv2.imread(images[img2_index], 1)
+    img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+
     print("comparing images: {} and {}".format(images[i], images[img2_index]))
 
     # process pair of images
