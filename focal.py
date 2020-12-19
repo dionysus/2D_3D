@@ -1,22 +1,30 @@
+'''
+Used to calculate the location of the matched point in the 3D space
+'''
+
 import numpy as np
-import cv2
 
 
 def get_focal_mm(focal, sensor_width, image_width):
-    # Focal is the focal length in pixels
-    # sensor_width is the actual width of the sensor in mm
-    # image_width is the width of the image in pixels
+    '''
+    Use the focal length in pixels, the sensor width in millimeters and the
+    image width in pixels to derive the focal length in millimeters
+    '''
     return focal*sensor_width/image_width
 
 
 def mm_pixel(focal_mm, focal_pixel):
+    '''
+    Find the ratio millimeters to pixels
+    '''
     return focal_mm/focal_pixel
 
 
 def principal_coordinates(focal, camera, angle):
-    # Want to find principal coordinates in real world values
-    # We know the focal length, camera coordinates and angle with respect
-    # to Z-axis
+    '''
+    Find the principal coordinates in real world values
+    '''
+    # Use -1 * focal since we are moving in the opposite directions
     c1 = camera[0] + (-focal * np.sin(angle))
     c2 = camera[1]
     c3 = camera[2] + (-focal * np.cos(angle))
@@ -24,13 +32,15 @@ def principal_coordinates(focal, camera, angle):
     return point
 
 def point_location(principal, p_plane, image_point, mmp, angle):
-    # Find the location of the point on the image plane in 3D space
+    '''
+    Find the location of the point on the image plane in 3D space
+    '''
     # Get x coordinate on image plane
     x_pix = image_point[0]-p_plane[0]
     # Get y coordinate on image plane
     y_pix = image_point[1] - p_plane[1]
     # In real coordinate system
-    y_mm = y_pix*mmp
+    y_mm = y_pix * mmp
     x_mm = x_pix * mmp
     # Find angle between image plane and Z-axis
     image_angle = angle + np.radians(90)
