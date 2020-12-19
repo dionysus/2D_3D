@@ -1,19 +1,16 @@
 '''
 Camera calibration functions
 
-Adapted from openCV docs
-https://docs.opencv.org/master/d9/dab/tutorial_homography.html
-
-With further explanations of chessboard gained from
-https://medium.com/@omar.ps16/stereo-3d-reconstruction-with-opencv-using-an-iphone-camera-part-ii-77754b58bfe0
+Adapted from openCV docs and chesesboard calibration tutorials:
+https://docs.opencv.org/master/d4/d94/tutorial_camera_calibration.html
+https://docs.opencv.org/3.4/dc/dbb/tutorial_py_calibration.html
 '''
 
 import numpy as np
 import cv2
 import glob
 import math
-import PIL.ExifTags
-import PIL.Image
+from PIL import ExifTags, Image
 from helpers import *
 
 from cloud import plot_point_cloud_colorless
@@ -37,11 +34,10 @@ def calibrate_camera():
   objp = np.zeros((board_h * board_w,3), np.float32)
   objp[:,:2] = np.mgrid[0:board_h,0:board_w].T.reshape(-1,2)
 
-  obj_points = [] # 3d point in real world space
-  img_points = [] # 2d points in image plane.
+  obj_points = []
+  img_points = []
 
   calibration_images = glob.glob("calibrate/*")
-  # print(calibration_images)
 
   # images to calibrate from
   for image in calibration_images:
@@ -52,35 +48,33 @@ def calibrate_camera():
       if not ret:
         print("no checkerboard found for: {}".format(image))
       else:
-          print("checkerboard found for: {}".format(image))
           # refine corner detection
           sub_corners = cv2.cornerSubPix(img,corners,(11,11),(-1,-1),criteria)
           img_points.append(sub_corners)
           obj_points.append(objp)
 
-          # Draw and display the corners
-          display_img = cv2.drawChessboardCorners(img, board_dims, sub_corners, ret)
-          # plot_img(display_img)
-
   # run calibrate camera with processed images
   ret, K, dist, rvecs, tvecs = cv2.calibrateCamera(
-                              obj_points, img_points,img.shape[::-1], None, None)
-
-  # Get Focal Length of source camera from image metadata
-  exif_img = PIL.Image.open(calibration_images[0])
-  exif_data = {
-  PIL.ExifTags.TAGS[k]:v
-  for k, v in exif_img._getexif().items()
-  if k in PIL.ExifTags.TAGS}
-  focal_length = exif_data['FocalLength']
-  print("focal length: {}".format(focal_length))
+                              obj_points, img_points, img.shape[::-1], None, None)
 
   # save calibration settings to file
   np.save("./calibrated_params/ret", ret)
   np.save("./calibrated_params/K", K)
   np.save("./calibrated_params/dist", dist)
-  np.save("./calibrated_params/FocalLength", focal_length)
 
+  # Get Focal Length of source camera from image metadata
+  get_focal_length(calibration_images[0])
+
+def get_focal_length(calibration_image):
+  '''
+  Get and Save Focal Length of source camera from image metadata
+  '''
+  img = Image.open(calibration_image)
+  img_exif = img.getexif()
+  img_exif_dict = dict(img_exif)
+  focal_length = img_exif_dict[37386] # focal length tag
+  print(focal_length)
+  np.save("./calibrated_params/FocalLength", focal_length)
 
 def save_camera_props(num_cameras, degree, distance, height):
   '''
@@ -138,15 +132,16 @@ def load_camera_dist():
   return dist
 
 if __name__ == "__main__":
-  num_cameras = 18
-  degree = 20
-  distance = 175
-  height = 0
+  calibrate_camera()
+  # num_cameras = 18
+  # degree = 20
+  # distance = 175
+  # height = 0
 
-  # save_camera_props(num_cameras,degree,distance,height)
-  camera_props = load_camera_props()
+  # # save_camera_props(num_cameras,degree,distance,height)
+  # camera_props = load_camera_props()
 
-  # check that it makes a full circle
-  camera_coords = camera_props[:, :3]
-  print(camera_props)
-  plot_point_cloud_colorless(camera_coords)
+  # # check that it makes a full circle
+  # camera_coords = camera_props[:, :3]
+  # print(camera_props)
+  # plot_point_cloud_colorless(camera_coords)
