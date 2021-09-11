@@ -1,6 +1,7 @@
-# DR.NRD's Miracle Photogrammetry Machine
+# 2D_3D Reconstruction
+Project Webpage: [https://dionysus.works/project/2d_3d/](https://dionysus.works/project/2d_3d/)
 
-# Process
+## Process
 - preprocess images
   - calibrate camera parameters
   - calculate camera positions
@@ -11,7 +12,7 @@
 - triangulation & color
 - point cloud generation
 
-# How to Use:
+## How to Use:
 Simply run `main.py`.
 
 The important lines are:
